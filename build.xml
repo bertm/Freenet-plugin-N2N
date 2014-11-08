@@ -1,30 +1,31 @@
 <?xml version="1.0"?>
 <!-- ant build file for Freenet -->
 
-<project name="Freenet" default="dist" basedir=".">
-	<property name="freenet-cvs-snapshot.location" location="../fred/dist/freenet.jar"/>
+<project name="N2N" default="dist" basedir=".">
+	<property file="override.properties"/>
+	<property name="freenet.location" location="../fred/dist/freenet.jar"/>
 	<property name="freenet-ext.location" location="../fred/lib/freenet-ext.jar"/>
-	<property name="svn.revision" value="@custom@"/>
-	<property name="source-version" value="1.5"/>
+	<property name="git.revision" value="@custom@"/>
+	<property name="source-version" value="1.6"/>
 	<property name="build" location="build/"/>
 	<property name="build-test" location="build-test/"/>
 	<property name="dist" location="dist/"/>
 	<property name="junit.location" value="/usr/share/java/junit.jar"/>
-	<available file="src/plugins/HelloWorld/Version.java" property="version.present"/>
+	<available file="src/java/nl/urandom/n2n/Version.java" property="version.present"/>
 	<available file="${junit.location}" property="junit.present"/>
 
 	<target name="mkdir">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build-test}"/>
 		<mkdir dir="${dist}"/>
-		<echo message="Using ${freenet-cvs-snapshot.location} as freenet-cvs-snapshot.jar"/>
+		<echo message="Using ${freenet.location} as freenet.jar"/>
 		<echo message="Using ${freenet-ext.location} as freenet-ext.jar"/>
 	</target>
 	
 	<target name="setver" if="version.present">
 		<!-- Update the Version file -->
-		<replace file="src/plugins/HelloWorld/Version.java">
-			<replacefilter token="@custom@" value="${svn.revision}"/>
+		<replace file="src/java/nl/urandom/n2n/Version.java">
+			<replacefilter token="@custom@" value="${git.revision}"/>
 		</replace>
 	</target>
 
@@ -35,13 +36,12 @@
 		<!-- Create the build directory structure used by compile -->
 
 		<!-- FIXME: remove the debug and replace with optimize -->
-		<javac srcdir="src/" destdir="${build}" debug="on" optimize="on" source="${source-version}">
+		<javac srcdir="src/java/" destdir="${build}" debug="on" optimize="on" source="${source-version}" includeantruntime="no">
 			<classpath>
 				<pathelement location="${freenet-ext.location}"/>
-				<pathelement location="${freenet-cvs-snapshot.location}"/>
+				<pathelement location="${freenet.location}"/>
 			</classpath>
 			<include name="**/*.java"/>
-			<exclude name="**/*Test.java"/>
 		</javac>
 	</target>
 
@@ -52,7 +52,7 @@
 			<classpath>
 				<pathelement path="${build}"/>
 				<pathelement location="${freenet-ext.location}"/>
-				<pathelement location="${freenet-cvs-snapshot.location}"/>
+				<pathelement location="${freenet.location}"/>
 				<pathelement location="${junit.location}"/>
 			</classpath>
 			<compilerarg value="-Xlint"/>
@@ -66,7 +66,7 @@
 				<pathelement path="${build}"/>
 				<pathelement path="${build-test}"/>
 				<pathelement location="${freenet-ext.location}"/>
-				<pathelement location="${freenet-cvs-snapshot.location}"/>
+				<pathelement location="${freenet.location}"/>
 				<pathelement location="${junit.location}"/>
 			</classpath>
 
@@ -85,12 +85,12 @@
 	<!-- ================================================== -->
 	<target name="dist" depends="clean,compile,junit"
 		description="generate the distribution" >
-		<jar jarfile="${dist}/HelloWorld.jar" duplicate="fail">
+		<jar jarfile="${dist}/N2N.jar" duplicate="fail">
 			<manifest>
-				<attribute name="Plugin-Main-Class" value="plugins.HelloWorld.HelloWorld"/>
+				<attribute name="Plugin-Main-Class" value="nl.urandom.n2n.N2N"/>
 			</manifest>
-			<fileset dir="src/" casesensitive="no">
-				<include name="*.txt"/>
+			<fileset dir="src/resources/" casesensitive="no">
+				<include name="**/*.properties"/>
 			</fileset>
 			<fileset dir="${build}/"/>
 		</jar>
